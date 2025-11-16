@@ -52,6 +52,25 @@ jobs:
         run: |
           make test
 
+      - name: "📊 Generate Coverage Report"
+        shell: bash
+        run: |
+          uv run --group test pytest tests/unit_tests \
+            --cov=. \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-fail-under=75
+        continue-on-error: true
+
+      - name: "📈 Upload Coverage to Codecov"
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-${{ inputs.working-directory }}
+        continue-on-error: true
+
       - name: "🔍 Calculate Minimum Dependency Versions"
         working-directory: ${{ inputs.working-directory }}
         id: min-version
